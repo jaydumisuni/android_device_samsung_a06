@@ -16,7 +16,7 @@ PRODUCT_MODEL := Galaxy A06
 PRODUCT_MANUFACTURER := samsung
 
 # -------------------------------------------------
-# Recovery Identity (VERSIONING)
+# Recovery Identity (Versioning)
 # -------------------------------------------------
 TW_DEVICE_VERSION := v1.2
 TW_RECOVERY_VERSION := TWRP-A06-v1.2
@@ -27,9 +27,14 @@ TW_RECOVERY_VERSION := TWRP-A06-v1.2
 ALLOW_MISSING_DEPENDENCIES := true
 
 # -------------------------------------------------
-# A/B & Dynamic Partitions
+# Dynamic Partitions / AVB
 # -------------------------------------------------
 PRODUCT_USE_DYNAMIC_PARTITIONS := true
+
+# -------------------------------------------------
+# Copy vendor files correctly (FIX for firmware error)
+# -------------------------------------------------
+RECOVERY_COPY_OUT_VENDOR := vendor
 
 # -------------------------------------------------
 # Filesystem Support
@@ -38,57 +43,45 @@ PRODUCT_PACKAGES += \
     fsck.ext4 \
     fsck.f2fs \
     mkfs.ext4 \
-    mkfs.f2fs
+    mkfs.f2fs \
+    e2fsck \
+    resize2fs \
+    tune2fs
 
 # -------------------------------------------------
-# Fastbootd (Userspace Fastboot)
+# Fastbootd (userspace fastboot)
 # -------------------------------------------------
 PRODUCT_PACKAGES += \
-    fastbootd
+    android.hardware.fastboot@1.0-impl-mock \
+    android.hardware.fastboot@1.0-service-mock
 
 # -------------------------------------------------
-# TWRP Core
+# Health / Properties
 # -------------------------------------------------
 PRODUCT_PACKAGES += \
-    twrp \
-    toolbox \
-    toybox
+    android.hardware.health@2.1-impl \
+    android.hardware.health@2.1-service
 
 # -------------------------------------------------
 # Recovery Init Scripts
 # -------------------------------------------------
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/init.recovery.mt6768.rc:recovery/root/init.recovery.mt6768.rc \
-    $(DEVICE_PATH)/recovery/root/init.recovery.samsung.rc:recovery/root/init.recovery.samsung.rc \
-    $(DEVICE_PATH)/recovery/root/init.recovery.usb.rc:recovery/root/init.recovery.usb.rc \
-    $(DEVICE_PATH)/recovery/root/dsms.rc:recovery/root/dsms.rc \
-    $(DEVICE_PATH)/recovery/root/dsms_common.rc:recovery/root/dsms_common.rc \
-    $(DEVICE_PATH)/recovery/root/snapuserd.rc:recovery/root/snapuserd.rc
+PRODUCT_PACKAGES += \
+    init.recovery.mt6768.rc \
+    init.recovery.samsung.rc \
+    init.recovery.usb.rc \
+    snapuserd.rc \
+    dsms.rc \
+    dsms_common.rc
 
 # -------------------------------------------------
-# Recovery FSTAB
+# Default Properties
 # -------------------------------------------------
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/etc/recovery.fstab:recovery/root/system/etc/recovery.fstab
+PRODUCT_SYSTEM_DEFAULT_PROPERTIES += \
+    ro.secure=0 \
+    ro.debuggable=1 \
+    persist.sys.usb.config=mtp,adb
 
 # -------------------------------------------------
-# TWRP Flags
+# A/B & OTA (disabled – recovery only)
 # -------------------------------------------------
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/system/etc/twrp.flags:recovery/root/system/etc/twrp.flags
-
-# -------------------------------------------------
-# Firmware (Touch / Sensors / Modem Support)
-# -------------------------------------------------
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/recovery/root/vendor/firmware:recovery/root/vendor/firmware
-
-# -------------------------------------------------
-# Properties
-# -------------------------------------------------
-PRODUCT_COPY_FILES += \
-    $(DEVICE_PATH)/system.prop:recovery/root/system.prop
-
-# -------------------------------------------------
-# End of File
-# -------------------------------------------------
+AB_OTA_UPDATER := false
